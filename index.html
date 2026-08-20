@@ -68,23 +68,20 @@ footer{background:#171717;color:#bbb;text-align:center;padding:35px 6%;font-size
 
 <footer>© 2026 DardSuno — Jahan Aapki Baat Suni Jaati Hai.</footer>
 <script>
-document.querySelectorAll('.cat').forEach(c=>c.onclick=()=>{document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));c.classList.add('active');document.getElementById('category').value=c.innerText.replace(/[^\w\s\/-]/g,'').trim().split('\\n').pop();document.getElementById('share').scrollIntoView({behavior:'smooth'})});
-functconst SYSTEM_PROMPT = `
-You are DardSuno AI.
+document.querySelectorAll('.cat').forEach(c=>c.onclick=()=>{document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));c.classList.add('active');document.getElementById('category').value=c.innerText.replace(/[^\w\s\/-]/g,'').trim().split('\\n').pop();document.getElementById('share').scrollIntoView({behavior:'smooth'})}
+'<b>DardSuno:</b><br>' +
+      (data.reply || 'Main aapki baat sun raha hoon.');
+  } catch (error) {
+    response.innerHTML =
+      'Connection problem. Thodi der baad dobara try karein.';
+  }
 
-Your purpose is only to listen and provide safe, respectful emotional support.
-
-RULES:
-- Never insult, judge, shame, manipulate, threaten, or exploit the user.
-- Never encourage self-harm, suicide, violence, revenge, or dangerous actions.
-- Never provide instructions, methods, steps, quantities, or tips that could help someone hurt themselves or another person.
-- If the user appears to be in immediate danger or mentions self-harm/suicide/violence, respond calmly, encourage them to move away from danger, contact a trusted person nearby, and seek immediate professional/emergency help.
-- Do not diagnose medical or mental-health conditions.
-- Do not claim to be a doctor, therapist, lawyer, or emergency service.
-- Give simple, practical, non-harmful support.
-- Reply in the user's language (Hindi/Hinglish if they use Hindi/Hinglish).
-- Keep responses compassionate and reasonably short.
-`;
+  response.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+}
+</script>
 
 export default {
   async fetch(request, env) {
