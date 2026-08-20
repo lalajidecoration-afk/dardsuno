@@ -69,14 +69,113 @@ footer{background:#171717;color:#bbb;text-align:center;padding:35px 6%;font-size
 <footer>© 2026 DardSuno — Jahan Aapki Baat Suni Jaati Hai.</footer>
 <script>
 document.querySelectorAll('.cat').forEach(c=>c.onclick=()=>{document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));c.classList.add('active');document.getElementById('category').value=c.innerText.replace(/[^\w\s\/-]/g,'').trim().split('\\n').pop();document.getElementById('share').scrollIntoView({behavior:'smooth'})});
-function listen(){
- const s=document.getElementById('story').value.trim(),r=document.getElementById('response');
- r.style.display='block';
- if(!s){r.innerHTML='<b>Apni baat likhiye.</b><br>Jo aap feel kar rahe hain, use apne words mein likh sakte hain.';return}
- r.innerHTML='<b>Aapki baat suni gayi.</b><br><br>Is prototype mein abhi real AI connected nahi hai. Final DardSuno mein AI aapki situation ko samjhega, zaroori follow-up questions poochega aur aapke context ke hisaab se practical next steps dega.<br><br><b>Next:</b> Agar aap chahein to apni situation ko thoda aur detail mein likhiye.';
- r.scrollIntoView({behavior:'smooth',block:'center'});
-}
-</script>
+functconst SYSTEM_PROMPT = `
+You are DardSuno AI.
+
+Your purpose is only to listen and provide safe, respectful emotional support.
+
+RULES:
+- Never insult, judge, shame, manipulate, threaten, or exploit the user.
+- Never encourage self-harm, suicide, violence, revenge, or dangerous actions.
+- Never provide instructions, methods, steps, quantities, or tips that could help someone hurt themselves or another person.
+- If the user appears to be in immediate danger or mentions self-harm/suicide/violence, respond calmly, encourage them to move away from danger, contact a trusted person nearby, and seek immediate professional/emergency help.
+- Do not diagnose medical or mental-health conditions.
+- Do not claim to be a doctor, therapist, lawyer, or emergency service.
+- Give simple, practical, non-harmful support.
+- Reply in the user's language (Hindi/Hinglish if they use Hindi/Hinglish).
+- Keep responses compassionate and reasonably short.
+`;
+
+export default {
+  async fetch(request, env) {
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
+
+    if (request.method !== "POST") {
+      return new Response("DardSuno AI is running.", {
+        headers: { "Access-Control-Allow-Origin": "*" }
+      });
+    }
+
+    try {
+      const body = await request.json();
+      const message = String(body.message || "").trim();
+
+      if (!message) {
+        return new Response(
+          JSON.stringify({ error: "Message required" }),
+          {
+            status: 400,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*"
+            }
+          }
+        );
+      }
+
+      const response = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${env.OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-5.6-luna",
+          instructions: SYSTEM_PROMPT,
+          input: message
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return new Response(
+          JSON.stringify({ error: "AI service error" }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*"
+            }
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          reply: data.output_text || "Main aapki baat sun raha hoon."
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ error: "Something went wrong." }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          }
+        }
+      );
+    }
+  }
+};
+</s
  <a href="https://wa.me/917906739609" target="_blank"
 style="display:block;text-align:center;background:#25D366;color:white;padding:15px;margin:20px auto;border-radius:10px;text-decoration:none;font-weight:bold;">
 WhatsApp par Baat Karein
